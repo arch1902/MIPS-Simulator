@@ -151,9 +151,10 @@ DATA MEMORY:
 -----------------------------------------
 
 Cycle 5 --> sw $t0, 0($s0)
+$t0 0 $s0
 DRAM request issued : WRITE
 
-Cycle 6-17 --> sw $t0, 0($s0)
+Cycle 6-17 --> sw $t1, 0($s1)
 INTEGER REGISTERS :
 R0 [zero] = 0
 R30 [r0] = 0
@@ -193,9 +194,10 @@ DATA MEMORY:
 -----------------------------------------
 
 Cycle 18 --> sw $t1, 0($s1)
+$t1 0 $s1
 DRAM request issued : WRITE
 
-Cycle 19-40 --> sw $t1, 0($s1)
+Cycle 19-40 --> lw $t2, 0($s0)
 INTEGER REGISTERS :
 R0 [zero] = 0
 R30 [r0] = 0
@@ -402,9 +404,10 @@ DATA MEMORY:
 -----------------------------------------
 
 Cycle 89 --> sw $t3, 0($s2)
+$t3 0 $s2
 DRAM request issued : WRITE
 
-Cycle 90-91 --> sw $t3, 0($s2)
+Cycle 90-91 --> $t9
 INTEGER REGISTERS :
 R0 [zero] = 0
 R30 [r0] = 0
@@ -455,8 +458,8 @@ mul ->0
 beq ->0
 bne ->0
 slt ->0
-lw ->2
-sw ->3
+lw ->4
+sw ->4
 addi ->5
 j -> 0
 -----------------------------------------

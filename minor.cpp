@@ -30,6 +30,20 @@ int n_total;
 int INSTRUCTION_MEMORY = pow(2,17); // Memory is word Addressable hence it has 2^19 Bytes
 int DATA_MEMORY = pow(2,17);
 
+
+int pc = 0;
+vector<int> row_buffer;
+int curr = -1; // current row number in the buffer
+vector<string> r,w;
+
+vector<string> instructions; //Vector containing all instructions 
+string line;
+int num=0;
+size_t x;
+string Instruction;
+int finish , start;
+
+
 // This code removes trailing and starting whitespace characters
 const std::string WHITESPACE = " \n\r\t\f\v";
 std::string ltrim(const std::string& s)
@@ -258,6 +272,170 @@ void validator_lw(string s, int l, string instruction){
         }
 }
 
+void add(){
+            out<<"Cycle "<<n_total<<" --> "<<instructions[pc]<<endl;
+            int y = (params[pc][3][0]=='$') ? reg[params[pc][3]] : stoi(params[pc][3]);
+            reg[params[pc][1]]=reg[params[pc][2]]+y;
+            pc++;
+            print();
+
+}
+
+void sub(){
+            out<<"Cycle "<<n_total<<" --> "<<instructions[pc]<<endl;
+            int y = (params[pc][3][0]=='$') ? reg[params[pc][3]] : stoi(params[pc][3]);
+            reg[params[pc][1]]=reg[params[pc][2]]-y;
+            pc++;
+            print();
+}
+
+void mul(){
+            out<<"Cycle "<<n_total<<" --> "<<instructions[pc]<<endl;
+            int y = (params[pc][3][0]=='$') ? reg[params[pc][3]] : stoi(params[pc][3]);
+            reg[params[pc][1]]=reg[params[pc][2]]*y;
+            pc++;
+            print();
+}
+
+void beq(){
+            out<<"Cycle "<<n_total<<" --> "<<instructions[pc]<<endl;
+            if (label.find(params[pc][3]) == label.end()){
+                cout << "Invalid Label on line "<<pc+1<<endl;
+                exit(-1);
+            }
+            int y = (params[pc][2][0]=='$') ? reg[params[pc][2]] : stoi(params[pc][2]);
+            if (reg[params[pc][1]] == y){
+                pc = label[params[pc][3]];
+                return;   
+            }
+            pc++;
+}
+
+void bne(){
+            out<<"Cycle "<<n_total<<" --> "<<instructions[pc]<<endl;
+            if (label.find(params[pc][3]) == label.end()){
+                cout << "Invalid Label on line "<<pc+1<<endl;
+                exit(-1);
+            }
+            int y = (params[pc][2][0]=='$') ? reg[params[pc][2]] : stoi(params[pc][2]);
+            if (reg[params[pc][1]] != y){
+                pc = label[params[pc][3]];
+                return;
+            }
+            pc++; 
+}
+
+void slt(){
+            out<<"Cycle "<<n_total<<" --> "<<instructions[pc]<<endl;
+            int y = (params[pc][3][0]=='$') ? reg[params[pc][3]] : stoi(params[pc][3]);
+            if(reg[params[pc][2]]< y ){
+                reg[params[pc][1]] = 1;
+            }else {
+                reg[params[pc][1]] = 0;
+            }
+            pc++; 
+            print();
+}
+
+void j(){
+            out<<"Cycle "<<n_total<<" --> "<<instructions[pc]<<endl;
+            if (label.find(params[pc][1]) == label.end()){
+                cout << "Invalid Label on line "<<pc+1;
+                exit(-1);
+            }
+            pc = label[params[pc][1]];
+}
+
+void addi(){
+            out<<"Cycle "<<n_total<<" --> "<<instructions[pc]<<endl;
+            reg[params[pc][1]]=reg[params[pc][2]]+stoi(params[pc][3]);
+            pc++; 
+            print();      
+}
+
+bool check1(){
+    if(count(r.begin(),r.end(),params[pc][1])) return false ;
+    if(count(w.begin(),w.end(),params[pc][1])) return false ;
+    if(count(w.begin(),w.end(),params[pc][2])) return false ;
+    if(count(w.begin(),w.end(),params[pc][3])) return false ;
+    return true;
+
+}
+
+bool check2(){
+    if(count(w.begin(),w.end(),params[pc][1])) return false ;
+    if(count(w.begin(),w.end(),params[pc][2])) return false ;
+    return true;   
+
+}
+
+
+void non_blocking(){
+    while(n_total<=finish && pc<num){
+        if(instructions[pc]==""){pc++;continue;}
+        Instruction=params[pc][0];
+        if(Instruction=="add" or Instruction=="sub" or Instruction=="mul" or Instruction=="addi" or Instruction=="slt"){
+            bool ok = check1();
+            if(!ok) return;
+        }
+
+        if(Instruction=="beq" or Instruction=="bne"){
+            bool ok = check2();
+            if(!ok) return;
+        }  
+
+        n_total++;
+        statistics[Instruction]++;
+
+        if(Instruction=="add") {
+            add();
+
+        } else if (Instruction=="sub"){
+            sub();
+
+        } else if (Instruction=="mul"){
+            mul();
+
+        } else if (Instruction=="beq"){
+            beq();
+
+        } else if (Instruction=="bne"){
+            bne();   
+
+        } else if (Instruction=="slt"){
+            slt();
+
+        } else if (Instruction=="j"){
+            j();
+
+        } else if (Instruction=="addi"){
+            addi();
+
+        } else if (Instruction=="lw"){
+            return;
+
+        } else if (Instruction=="sw"){
+            return;
+
+        } else if( label.find(params[pc][0]) != label.end() ){
+             pc ++;
+             n_total --;
+
+        }else{
+            continue;
+        }
+        if(reg["$zero"] != 0){
+            cout<<"The value in Zero Registor is not mutable. Command on line "<<pc<<" tries to change its value"<<endl;
+            exit(-1);
+        }
+
+
+    }
+
+}
+
+
+
 
 int main(int argc, char *argv[]) {
     file1.open(argv[1]);
@@ -266,12 +444,7 @@ int main(int argc, char *argv[]) {
     int ROW_ACCESS_DELAY = atoi(argv[2]);
     int COL_ACCESS_DELAY = atoi(argv[3]);
     out.open(input_file.substr(0,input_file.size()-4)+"_output.txt");
-    vector<string> instructions; //Vector containing all instructions 
-    string line;
-    int num=0;
-    size_t x;
- 
-    string Instruction;
+
     while(getline(file1,line)){
         line = trim(line);
         instructions.push_back(line);
@@ -344,9 +517,7 @@ int main(int argc, char *argv[]) {
     //     cout<<j.first<<"->"<<j.second<<"   ";
     // }
     // cout<<endl;
-    int pc = 0;
-    vector<int> row_buffer;
-    int curr = -1; // current row number in the buffer
+
 
     // Program Counter that iterates over the instruction set and points to the instruction being executed
     while(pc<num){
@@ -356,133 +527,104 @@ int main(int argc, char *argv[]) {
         Instruction=params[pc][0];
         statistics[Instruction] ++;
         if(Instruction=="add") {
-            out<<"Cycle "<<n_total<<" --> "<<instructions[pc]<<endl;
-            int y = (params[pc][3][0]=='$') ? reg[params[pc][3]] : stoi(params[pc][3]);
-            reg[params[pc][1]]=reg[params[pc][2]]+y;
-            pc++;
-            print();
+            add();
 
         } else if (Instruction=="sub"){
-            out<<"Cycle "<<n_total<<" --> "<<instructions[pc]<<endl;
-            int y = (params[pc][3][0]=='$') ? reg[params[pc][3]] : stoi(params[pc][3]);
-            reg[params[pc][1]]=reg[params[pc][2]]-y;
-            pc++;
-            print();
+            sub();
 
         } else if (Instruction=="mul"){
-            out<<"Cycle "<<n_total<<" --> "<<instructions[pc]<<endl;
-            int y = (params[pc][3][0]=='$') ? reg[params[pc][3]] : stoi(params[pc][3]);
-            reg[params[pc][1]]=reg[params[pc][2]]*y;
-            pc++;
-            print();
+            mul();
 
         } else if (Instruction=="beq"){
-            out<<"Cycle "<<n_total<<" --> "<<instructions[pc]<<endl;
-            if (label.find(params[pc][3]) == label.end()){
-                cout << "Invalid Label on line "<<pc+1<<endl;
-                exit(-1);
-            }
-            int y = (params[pc][2][0]=='$') ? reg[params[pc][2]] : stoi(params[pc][2]);
-            if (reg[params[pc][1]] == y){
-                pc = label[params[pc][3]];
-                print();
-                continue;
-            }
-            pc++;
+            beq();
 
         } else if (Instruction=="bne"){
-            out<<"Cycle "<<n_total<<" --> "<<instructions[pc]<<endl;
-            if (label.find(params[pc][3]) == label.end()){
-                cout << "Invalid Label on line "<<pc+1<<endl;
-                exit(-1);
-            }
-            int y = (params[pc][2][0]=='$') ? reg[params[pc][2]] : stoi(params[pc][2]);
-            if (reg[params[pc][1]] != y){
-                pc = label[params[pc][3]];
-                print();
-                continue;
-            }
-            pc++;    
+            bne();   
 
         } else if (Instruction=="slt"){
-            out<<"Cycle "<<n_total<<" --> "<<instructions[pc]<<endl;
-            int y = (params[pc][3][0]=='$') ? reg[params[pc][3]] : stoi(params[pc][3]);
-            if(reg[params[pc][2]]< y ){
-                reg[params[pc][1]] = 1;
-            }else {
-                reg[params[pc][1]] = 0;
-            }
-            pc++; 
-            print();
+            slt();
 
         } else if (Instruction=="j"){
-            out<<"Cycle "<<n_total<<" --> "<<instructions[pc]<<endl;
-            if (label.find(params[pc][1]) == label.end()){
-                cout << "Invalid Label on line "<<pc+1;
-                exit(-1);
-            }
-            pc = label[params[pc][1]];
+            j();
 
-        } else if (Instruction=="lw"){
+        } else if (Instruction=="lw"){      // READ
+
             out<<"Cycle "<<n_total<<" --> "<<instructions[pc]<<endl;
             int offset = stoi(params[pc][2]);
             if((offset+reg[params[pc][3]])%4 != 0 || (offset+reg[params[pc][3]])<0 ||(offset+reg[params[pc][3]])>DATA_MEMORY*4){
                 cout<<"Program tried to access invalid memory location. "<<endl;
                 exit(-1);
             }
-
             out<<"DRAM request issued : READ"<<endl<<endl;
-            int start = n_total;
-
+            start = n_total;
+            
             int row = (offset+reg[params[pc][3]])/1024;
             if(curr==-1){
-                n_total += ROW_ACCESS_DELAY + COL_ACCESS_DELAY;
+                finish =start + ROW_ACCESS_DELAY + COL_ACCESS_DELAY;
                 curr = row;
             } else if (curr == row){
-                n_total += COL_ACCESS_DELAY;
+                finish =start + COL_ACCESS_DELAY;
             } else {
-                n_total += ROW_ACCESS_DELAY*2 + COL_ACCESS_DELAY;
+                finish =start + ROW_ACCESS_DELAY*2 + COL_ACCESS_DELAY;
                 curr = row;                
             }
+            int pc_temp = pc;
 
-            out<<"Cycle "<<start+1<<"-"<<n_total<<" --> "<<instructions[pc]<<endl;
-            reg[params[pc][1]] = data_memory[(offset+reg[params[pc][3]])];
             pc++;
+            w.push_back(params[pc_temp][1]);
+            r.push_back(to_string(offset+reg[params[pc_temp][3]]));
+            non_blocking();
+            r.clear();
+            w.clear();
+            n_total=finish;
+
+            out<<"Cycle "<<start+1<<"-"<<finish<<" --> "<<instructions[pc_temp]<<endl;
+            reg[params[pc_temp][1]] = data_memory[(offset+reg[params[pc_temp][3]])];
+            
             print();  
 
-        } else if (Instruction=="sw"){
+        } else if (Instruction=="sw"){       // WRITE
+
             out<<"Cycle "<<n_total<<" --> "<<instructions[pc]<<endl;
             int offset = stoi(params[pc][2]);
             if((offset+reg[params[pc][3]])%4 != 0 || (offset+reg[params[pc][3]])<0  || (offset+reg[params[pc][3]])>DATA_MEMORY*4){
                 cout<<"Program tried to access invalid memory location."<<endl;
                 exit(-1);
             }
-
             out<<"DRAM request issued : WRITE"<<endl<<endl;
-            int start = n_total;
-
+            
+            start = n_total;
+            
             int row = (offset+reg[params[pc][3]])/1024;
+            
             if(curr==-1){
-                n_total += ROW_ACCESS_DELAY + COL_ACCESS_DELAY;
+                finish =start + ROW_ACCESS_DELAY + COL_ACCESS_DELAY;
                 curr = row;
             } else if (curr == row){
-                n_total += COL_ACCESS_DELAY;
+                finish =start + COL_ACCESS_DELAY;
             } else {
-                n_total += ROW_ACCESS_DELAY*2 + COL_ACCESS_DELAY;
+                finish =start + ROW_ACCESS_DELAY*2 + COL_ACCESS_DELAY;
                 curr = row;                
             }
-
-            out<<"Cycle "<<start+1<<"-"<<n_total<<" --> "<<instructions[pc]<<endl;
-            data_memory[(offset+reg[params[pc][3]])] = reg[params[pc][1]];
-            DRAM[(offset+reg[params[pc][3]])/1024][((offset+reg[params[pc][3]])%1024)/4] = reg[params[pc][1]];
+            int pc_temp = pc;
+            
             pc++;
+            r.push_back(params[pc_temp][1]);
+            w.push_back(to_string(offset+reg[params[pc_temp][3]]));
+            non_blocking();
+            r.clear();
+            w.clear();
+            n_total=finish;
+            
+            
+
+            out<<"Cycle "<<start+1<<"-"<<n_total<<" --> "<<instructions[pc_temp]<<endl;
+            data_memory[(offset+reg[params[pc_temp][3]])] = reg[params[pc_temp][1]];
+            DRAM[(offset+reg[params[pc_temp][3]])/1024][((offset+reg[params[pc_temp][3]])%1024)/4] = reg[params[pc_temp][1]];
             print();
 
         } else if (Instruction=="addi"){
-            out<<"Cycle "<<n_total<<" --> "<<instructions[pc]<<endl;
-            reg[params[pc][1]]=reg[params[pc][2]]+stoi(params[pc][3]);
-            pc++; 
-            print();  
+            addi();  
 
         } else if( label.find(params[pc][0]) != label.end() ){
              pc ++;
