@@ -1,42 +1,5 @@
-Cycle 1 --> main: 
-
-R0 [zero] = 0
-R30 [r0] = 0
-R1  [r1] = 0
-R2  [r2] = 0
-R3  [r3] = 0
-R4  [r4] = 0
-R5  [r5] = 0
-R6  [r6] = 0
-R7  [r7] = 0
-R8  [r8] = 0
-R9  [r9] = 0
-R10 [t0] = 0
-R11 [t1] = 0
-R12 [t2] = 0
-R13 [t3] = 0
-R14 [t4] = 0
-R15 [t5] = 0
-R16 [t6] = 0
-R17 [t7] = 0
-R18 [t8] = 0
-R19 [t9] = 0
-R20 [s0] = 0
-R21 [s1] = 0
-R22 [s2] = 0
-R23 [s3] = 0
-R24 [s4] = 0
-R25 [s5] = 0
-R26 [s6] = 0
-R27 [s7] = 0
-R28 [s8] = 0
-R29 [s9] = 0
-R31 [sp] = 0
------------------------------------------
-DATA MEMORY
-
-Cycle 1 --> addi $s0, $zero, 1000 
-
+Cycle 1 --> addi $s0, $zero, 1000
+INTEGER REGISTERS :
 R0 [zero] = 0
 R30 [r0] = 0
 R1  [r1] = 0
@@ -69,11 +32,12 @@ R27 [s7] = 0
 R28 [s8] = 0
 R29 [s9] = 0
 R31 [sp] = 0
+
+DATA MEMORY:
 -----------------------------------------
-DATA MEMORY
 
-Cycle 2 --> addi $s1, $zero, 1024 
-
+Cycle 2 --> addi $s1, $zero, 1024
+INTEGER REGISTERS :
 R0 [zero] = 0
 R30 [r0] = 0
 R1  [r1] = 0
@@ -106,11 +70,12 @@ R27 [s7] = 0
 R28 [s8] = 0
 R29 [s9] = 0
 R31 [sp] = 0
+
+DATA MEMORY:
 -----------------------------------------
-DATA MEMORY
 
-Cycle 3 --> addi $t0, $zero, 1 
-
+Cycle 3 --> addi $t0, $zero, 1
+INTEGER REGISTERS :
 R0 [zero] = 0
 R30 [r0] = 0
 R1  [r1] = 0
@@ -143,11 +108,12 @@ R27 [s7] = 0
 R28 [s8] = 0
 R29 [s9] = 0
 R31 [sp] = 0
+
+DATA MEMORY:
 -----------------------------------------
-DATA MEMORY
 
-Cycle 4 --> addi $t1, $zero, 2 
-
+Cycle 4 --> addi $t1, $zero, 2
+INTEGER REGISTERS :
 R0 [zero] = 0
 R30 [r0] = 0
 R1  [r1] = 0
@@ -180,11 +146,15 @@ R27 [s7] = 0
 R28 [s8] = 0
 R29 [s9] = 0
 R31 [sp] = 0
+
+DATA MEMORY:
 -----------------------------------------
-DATA MEMORY
 
-Cycle 5 --> sw $t0, 0($s0) 
+Cycle 5 --> sw $t0, 0($s0)
+DRAM request issued : WRITE
 
+Cycle 6-17 --> sw $t0, 0($s0)
+INTEGER REGISTERS :
 R0 [zero] = 0
 R30 [r0] = 0
 R1  [r1] = 0
@@ -217,12 +187,16 @@ R27 [s7] = 0
 R28 [s8] = 0
 R29 [s9] = 0
 R31 [sp] = 0
+
+DATA MEMORY:
+1000-1003: 1
 -----------------------------------------
-DATA MEMORY
-1000: 1
 
-Cycle 6 --> sw $t1, 0($s1) 
+Cycle 18 --> sw $t1, 0($s1)
+DRAM request issued : WRITE
 
+Cycle 19-40 --> sw $t1, 0($s1)
+INTEGER REGISTERS :
 R0 [zero] = 0
 R30 [r0] = 0
 R1  [r1] = 0
@@ -255,13 +229,17 @@ R27 [s7] = 0
 R28 [s8] = 0
 R29 [s9] = 0
 R31 [sp] = 0
+
+DATA MEMORY:
+1000-1003: 1
+1024-1027: 2
 -----------------------------------------
-DATA MEMORY
-1000: 1
-1024: 2
 
-Cycle 7 --> lw $t2, 0($s0) 
+Cycle 41 --> lw $t2, 0($s0)
+DRAM request issued : READ
 
+Cycle 42-63 --> lw $t2, 0($s0)
+INTEGER REGISTERS :
 R0 [zero] = 0
 R30 [r0] = 0
 R1  [r1] = 0
@@ -294,13 +272,17 @@ R27 [s7] = 0
 R28 [s8] = 0
 R29 [s9] = 0
 R31 [sp] = 0
+
+DATA MEMORY:
+1000-1003: 1
+1024-1027: 2
 -----------------------------------------
-DATA MEMORY
-1000: 1
-1024: 2
 
-Cycle 8 --> lw $t3, 0($s1) 
+Cycle 64 --> lw $t3, 0($s1)
+DRAM request issued : READ
 
+Cycle 65-86 --> lw $t3, 0($s1)
+INTEGER REGISTERS :
 R0 [zero] = 0
 R30 [r0] = 0
 R1  [r1] = 0
@@ -333,13 +315,14 @@ R27 [s7] = 0
 R28 [s8] = 0
 R29 [s9] = 0
 R31 [sp] = 0
+
+DATA MEMORY:
+1000-1003: 1
+1024-1027: 2
 -----------------------------------------
-DATA MEMORY
-1000: 1
-1024: 2
 
-Cycle 9 --> add $t3, $t3, $t2 
-
+Cycle 87 --> add $t3, $t3, $t2
+INTEGER REGISTERS :
 R0 [zero] = 0
 R30 [r0] = 0
 R1  [r1] = 0
@@ -372,13 +355,14 @@ R27 [s7] = 0
 R28 [s8] = 0
 R29 [s9] = 0
 R31 [sp] = 0
+
+DATA MEMORY:
+1000-1003: 1
+1024-1027: 2
 -----------------------------------------
-DATA MEMORY
-1000: 1
-1024: 2
 
-Cycle 10 --> addi $s2, $zero, 1028 
-
+Cycle 88 --> addi $s2, $zero, 1028
+INTEGER REGISTERS :
 R0 [zero] = 0
 R30 [r0] = 0
 R1  [r1] = 0
@@ -411,13 +395,17 @@ R27 [s7] = 0
 R28 [s8] = 0
 R29 [s9] = 0
 R31 [sp] = 0
+
+DATA MEMORY:
+1000-1003: 1
+1024-1027: 2
 -----------------------------------------
-DATA MEMORY
-1000: 1
-1024: 2
 
-Cycle 11 --> sw $t3, 0($s2) 
+Cycle 89 --> sw $t3, 0($s2)
+DRAM request issued : WRITE
 
+Cycle 90-91 --> sw $t3, 0($s2)
+INTEGER REGISTERS :
 R0 [zero] = 0
 R30 [r0] = 0
 R1  [r1] = 0
@@ -450,53 +438,14 @@ R27 [s7] = 0
 R28 [s8] = 0
 R29 [s9] = 0
 R31 [sp] = 0
+
+DATA MEMORY:
+1000-1003: 1
+1024-1027: 2
+1028-1031: 3
 -----------------------------------------
-DATA MEMORY
-1000: 1
-1024: 2
-1028: 3
 
-Cycle 12 --> exit: 
-
-R0 [zero] = 0
-R30 [r0] = 0
-R1  [r1] = 0
-R2  [r2] = 0
-R3  [r3] = 0
-R4  [r4] = 0
-R5  [r5] = 0
-R6  [r6] = 0
-R7  [r7] = 0
-R8  [r8] = 0
-R9  [r9] = 0
-R10 [t0] = 1
-R11 [t1] = 2
-R12 [t2] = 1
-R13 [t3] = 3
-R14 [t4] = 0
-R15 [t5] = 0
-R16 [t6] = 0
-R17 [t7] = 0
-R18 [t8] = 0
-R19 [t9] = 0
-R20 [s0] = 1000
-R21 [s1] = 1024
-R22 [s2] = 1028
-R23 [s3] = 0
-R24 [s4] = 0
-R25 [s5] = 0
-R26 [s6] = 0
-R27 [s7] = 0
-R28 [s8] = 0
-R29 [s9] = 0
-R31 [sp] = 0
------------------------------------------
-DATA MEMORY
-1000: 1
-1024: 2
-1028: 3
-
-Number of clock cycles: 11
+Number of clock cycles: 91
 Instruction Memory Used: 76 Bytes
 Data Memory Used: 12 Bytes
 Number of times each instruction was executed :
@@ -511,7 +460,7 @@ sw ->3
 addi ->5
 j -> 0
 -----------------------------------------
-DATA MEMORY
-1000: 1
-1024: 2
-1028: 3
+Data Memory at the end of Execution:
+1000-1003: 1
+1024-1027: 2
+1028-1031: 3
