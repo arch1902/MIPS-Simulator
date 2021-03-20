@@ -1,1 +1,1 @@
-# Non-blocking-DRAM-MIPS-Simulator-
+# Non-blocking-DRAM-MIPS-Simulator
