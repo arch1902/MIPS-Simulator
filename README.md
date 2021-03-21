@@ -1,1 +1,1 @@
-# Non-blocking-DRAM-MIPS-Simulator
+# Non-blocking MIPS Simulator with DRAM Timing Model
