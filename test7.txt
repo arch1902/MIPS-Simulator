@@ -1,0 +1,28 @@
+addi $r1, $r1, 3272
+sub $r2, $r1, $r2
+mul $r1, $r1, $r2
+sw $r1, 4($zero)
+mul $r1, $r2, $r1
+slt $r2, $r2, $r4
+sw $r2, 4($zero)
+addi $r2, $r3, 3575
+sub $r2, $r9, $r2
+slt $r2, $r2, $r7
+slt $r1, $r1, $r2
+addi $r6, $r4, 3404
+sw $r5, 4($zero)
+addi $r2, $r2, 1320
+mul $r6, $r1, $r2
+addi $r9, $r1, 274
+slt $r2, $r2, $r3
+addi $r1, $r2, 801
+lw $r3, 4($zero)
+mul $r3, $r4, $r3
+lw $r1, 4($zero)
+slt $r2, $r1, $r2
+slt $r2, $r9, $r1
+slt $r2, $r1, $r2
+sw $r9, 0($zero)
+mul $r2, $r9, $r9
+sw $r2, 8($zero)
+mul $r1, $r2, $r7

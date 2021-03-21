@@ -30,6 +30,22 @@ int n_total;
 int INSTRUCTION_MEMORY = pow(2,17); // Memory is word Addressable hence it has 2^19 Bytes
 int DATA_MEMORY = pow(2,17);
 
+
+int pc = 0;
+vector<int> row_buffer;
+int num_rbf = 0;
+int curr = -1; // current row number in the buffer
+vector<string> r,w;
+string msg1,msg2;
+
+vector<string> instructions; //Vector containing all instructions 
+string line;
+int num=0;
+size_t x;
+string Instruction;
+int finish , start;
+
+
 // This code removes trailing and starting whitespace characters
 const std::string WHITESPACE = " \n\r\t\f\v";
 std::string ltrim(const std::string& s)
@@ -60,37 +76,37 @@ void validator(vector<string> V, string s,int l){
 // Prints the registers in decimal format
 void print(){
     out<< "INTEGER REGISTERS :"<<endl;
-    out<<"R0 [zero] = "<<reg["$zero"]<<endl;
-    out<<"R30 [r0] = "<<reg["$r0"]<<endl;
-    out<<"R1  [r1] = "<<reg["$r1"]<<endl;
-    out<<"R2  [r2] = "<<reg["$r2"]<<endl;
-    out<<"R3  [r3] = "<<reg["$r3"]<<endl;
-    out<<"R4  [r4] = "<<reg["$r4"]<<endl;
-    out<<"R5  [r5] = "<<reg["$r5"]<<endl;
-    out<<"R6  [r6] = "<<reg["$r6"]<<endl;
-    out<<"R7  [r7] = "<<reg["$r7"]<<endl;
-    out<<"R8  [r8] = "<<reg["$r8"]<<endl;
-    out<<"R9  [r9] = "<<reg["$r9"]<<endl;
-    out<<"R10 [t0] = "<<reg["$t0"]<<endl;
-    out<<"R11 [t1] = "<<reg["$t1"]<<endl;
-    out<<"R12 [t2] = "<<reg["$t2"]<<endl;
-    out<<"R13 [t3] = "<<reg["$t3"]<<endl;
-    out<<"R14 [t4] = "<<reg["$t4"]<<endl;
-    out<<"R15 [t5] = "<<reg["$t5"]<<endl;
-    out<<"R16 [t6] = "<<reg["$t6"]<<endl;
-    out<<"R17 [t7] = "<<reg["$t7"]<<endl;
-    out<<"R18 [t8] = "<<reg["$t8"]<<endl;
-    out<<"R19 [t9] = "<<reg["$t9"]<<endl;
-    out<<"R20 [s0] = "<<reg["$s0"]<<endl;
-    out<<"R21 [s1] = "<<reg["$s1"]<<endl;
-    out<<"R22 [s2] = "<<reg["$s2"]<<endl;
-    out<<"R23 [s3] = "<<reg["$s3"]<<endl;
-    out<<"R24 [s4] = "<<reg["$s4"]<<endl;
-    out<<"R25 [s5] = "<<reg["$s5"]<<endl;
-    out<<"R26 [s6] = "<<reg["$s6"]<<endl;
-    out<<"R27 [s7] = "<<reg["$s7"]<<endl;
-    out<<"R28 [s8] = "<<reg["$s8"]<<endl;
-    out<<"R29 [s9] = "<<reg["$s9"]<<endl;
+    out<<"R0  [zero] = "<<reg["$zero"]<<endl;
+    out<<"R1  [r0] = "<<reg["$r0"]<<endl;
+    out<<"R2  [r1] = "<<reg["$r1"]<<endl;
+    out<<"R3  [r2] = "<<reg["$r2"]<<endl;
+    out<<"R4  [r3] = "<<reg["$r3"]<<endl;
+    out<<"R5  [r4] = "<<reg["$r4"]<<endl;
+    out<<"R6  [r5] = "<<reg["$r5"]<<endl;
+    out<<"R7  [r6] = "<<reg["$r6"]<<endl;
+    out<<"R8  [r7] = "<<reg["$r7"]<<endl;
+    out<<"R9  [r8] = "<<reg["$r8"]<<endl;
+    out<<"R10 [r9] = "<<reg["$r9"]<<endl;
+    out<<"R11 [t0] = "<<reg["$t0"]<<endl;
+    out<<"R12 [t1] = "<<reg["$t1"]<<endl;
+    out<<"R13 [t2] = "<<reg["$t2"]<<endl;
+    out<<"R14 [t3] = "<<reg["$t3"]<<endl;
+    out<<"R15 [t4] = "<<reg["$t4"]<<endl;
+    out<<"R16 [t5] = "<<reg["$t5"]<<endl;
+    out<<"R17 [t6] = "<<reg["$t6"]<<endl;
+    out<<"R18 [t7] = "<<reg["$t7"]<<endl;
+    out<<"R19 [t8] = "<<reg["$t8"]<<endl;
+    out<<"R20 [t9] = "<<reg["$t9"]<<endl;
+    out<<"R21 [s0] = "<<reg["$s0"]<<endl;
+    out<<"R22 [s1] = "<<reg["$s1"]<<endl;
+    out<<"R23 [s2] = "<<reg["$s2"]<<endl;
+    out<<"R24 [s3] = "<<reg["$s3"]<<endl;
+    out<<"R25 [s4] = "<<reg["$s4"]<<endl;
+    out<<"R26 [s5] = "<<reg["$s5"]<<endl;
+    out<<"R27 [s6] = "<<reg["$s6"]<<endl;
+    out<<"R28 [s7] = "<<reg["$s7"]<<endl;
+    out<<"R29 [s8] = "<<reg["$s8"]<<endl;
+    out<<"R30 [s9] = "<<reg["$s9"]<<endl;
 
     out<<"R31 [sp] = "<<reg["$sp"]<<endl<<endl;
 
@@ -258,6 +274,88 @@ void validator_lw(string s, int l, string instruction){
         }
 }
 
+void add(){
+            out<<"Cycle "<<n_total<<" --> "<<instructions[pc]<<endl;
+            int y = (params[pc][3][0]=='$') ? reg[params[pc][3]] : stoi(params[pc][3]);
+            reg[params[pc][1]]=reg[params[pc][2]]+y;
+            pc++;
+            print();
+
+}
+
+void sub(){
+            out<<"Cycle "<<n_total<<" --> "<<instructions[pc]<<endl;
+            int y = (params[pc][3][0]=='$') ? reg[params[pc][3]] : stoi(params[pc][3]);
+            reg[params[pc][1]]=reg[params[pc][2]]-y;
+            pc++;
+            print();
+}
+
+void mul(){
+            out<<"Cycle "<<n_total<<" --> "<<instructions[pc]<<endl;
+            int y = (params[pc][3][0]=='$') ? reg[params[pc][3]] : stoi(params[pc][3]);
+            reg[params[pc][1]]=reg[params[pc][2]]*y;
+            pc++;
+            print();
+}
+
+void beq(){
+            out<<"Cycle "<<n_total<<" --> "<<instructions[pc]<<endl;
+            if (label.find(params[pc][3]) == label.end()){
+                cout << "Invalid Label on line "<<pc+1<<endl;
+                exit(-1);
+            }
+            int y = (params[pc][2][0]=='$') ? reg[params[pc][2]] : stoi(params[pc][2]);
+            if (reg[params[pc][1]] == y){
+                pc = label[params[pc][3]];
+                return;   
+            }
+            pc++;
+}
+
+void bne(){
+            out<<"Cycle "<<n_total<<" --> "<<instructions[pc]<<endl;
+            if (label.find(params[pc][3]) == label.end()){
+                cout << "Invalid Label on line "<<pc+1<<endl;
+                exit(-1);
+            }
+            int y = (params[pc][2][0]=='$') ? reg[params[pc][2]] : stoi(params[pc][2]);
+            if (reg[params[pc][1]] != y){
+                pc = label[params[pc][3]];
+                return;
+            }
+            pc++; 
+}
+
+void slt(){
+            out<<"Cycle "<<n_total<<" --> "<<instructions[pc]<<endl;
+            int y = (params[pc][3][0]=='$') ? reg[params[pc][3]] : stoi(params[pc][3]);
+            if(reg[params[pc][2]]< y ){
+                reg[params[pc][1]] = 1;
+            }else {
+                reg[params[pc][1]] = 0;
+            }
+            pc++; 
+            print();
+}
+
+void j(){
+            out<<"Cycle "<<n_total<<" --> "<<instructions[pc]<<endl;
+            if (label.find(params[pc][1]) == label.end()){
+                cout << "Invalid Label on line "<<pc+1;
+                exit(-1);
+            }
+            pc = label[params[pc][1]];
+}
+
+void addi(){
+            out<<"Cycle "<<n_total<<" --> "<<instructions[pc]<<endl;
+            reg[params[pc][1]]=reg[params[pc][2]]+stoi(params[pc][3]);
+            pc++; 
+            print();      
+}
+
+
 
 int main(int argc, char *argv[]) {
     file1.open(argv[1]);
@@ -265,13 +363,8 @@ int main(int argc, char *argv[]) {
     string input_file = argv[1];
     int ROW_ACCESS_DELAY = atoi(argv[2]);
     int COL_ACCESS_DELAY = atoi(argv[3]);
-    out.open(input_file.substr(0,input_file.size()-4)+"_output.txt");
-    vector<string> instructions; //Vector containing all instructions 
-    string line;
-    int num=0;
-    size_t x;
- 
-    string Instruction;
+    out.open(input_file.substr(0,input_file.size()-4)+"_output_part1.txt");
+
     while(getline(file1,line)){
         line = trim(line);
         instructions.push_back(line);
@@ -344,9 +437,7 @@ int main(int argc, char *argv[]) {
     //     cout<<j.first<<"->"<<j.second<<"   ";
     // }
     // cout<<endl;
-    int pc = 0;
-    vector<int> row_buffer;
-    int curr = -1; // current row number in the buffer
+
 
     // Program Counter that iterates over the instruction set and points to the instruction being executed
     while(pc<num){
@@ -356,133 +447,122 @@ int main(int argc, char *argv[]) {
         Instruction=params[pc][0];
         statistics[Instruction] ++;
         if(Instruction=="add") {
-            out<<"Cycle "<<n_total<<" --> "<<instructions[pc]<<endl;
-            int y = (params[pc][3][0]=='$') ? reg[params[pc][3]] : stoi(params[pc][3]);
-            reg[params[pc][1]]=reg[params[pc][2]]+y;
-            pc++;
-            print();
+            add();
 
         } else if (Instruction=="sub"){
-            out<<"Cycle "<<n_total<<" --> "<<instructions[pc]<<endl;
-            int y = (params[pc][3][0]=='$') ? reg[params[pc][3]] : stoi(params[pc][3]);
-            reg[params[pc][1]]=reg[params[pc][2]]-y;
-            pc++;
-            print();
+            sub();
 
         } else if (Instruction=="mul"){
-            out<<"Cycle "<<n_total<<" --> "<<instructions[pc]<<endl;
-            int y = (params[pc][3][0]=='$') ? reg[params[pc][3]] : stoi(params[pc][3]);
-            reg[params[pc][1]]=reg[params[pc][2]]*y;
-            pc++;
-            print();
+            mul();
 
         } else if (Instruction=="beq"){
-            out<<"Cycle "<<n_total<<" --> "<<instructions[pc]<<endl;
-            if (label.find(params[pc][3]) == label.end()){
-                cout << "Invalid Label on line "<<pc+1<<endl;
-                exit(-1);
-            }
-            int y = (params[pc][2][0]=='$') ? reg[params[pc][2]] : stoi(params[pc][2]);
-            if (reg[params[pc][1]] == y){
-                pc = label[params[pc][3]];
-                print();
-                continue;
-            }
-            pc++;
+            beq();
 
         } else if (Instruction=="bne"){
-            out<<"Cycle "<<n_total<<" --> "<<instructions[pc]<<endl;
-            if (label.find(params[pc][3]) == label.end()){
-                cout << "Invalid Label on line "<<pc+1<<endl;
-                exit(-1);
-            }
-            int y = (params[pc][2][0]=='$') ? reg[params[pc][2]] : stoi(params[pc][2]);
-            if (reg[params[pc][1]] != y){
-                pc = label[params[pc][3]];
-                print();
-                continue;
-            }
-            pc++;    
+            bne();   
 
         } else if (Instruction=="slt"){
-            out<<"Cycle "<<n_total<<" --> "<<instructions[pc]<<endl;
-            int y = (params[pc][3][0]=='$') ? reg[params[pc][3]] : stoi(params[pc][3]);
-            if(reg[params[pc][2]]< y ){
-                reg[params[pc][1]] = 1;
-            }else {
-                reg[params[pc][1]] = 0;
-            }
-            pc++; 
-            print();
+            slt();
 
         } else if (Instruction=="j"){
-            out<<"Cycle "<<n_total<<" --> "<<instructions[pc]<<endl;
-            if (label.find(params[pc][1]) == label.end()){
-                cout << "Invalid Label on line "<<pc+1;
-                exit(-1);
-            }
-            pc = label[params[pc][1]];
+            j();
 
-        } else if (Instruction=="lw"){
+        } else if (Instruction=="lw"){      // READ
+
             out<<"Cycle "<<n_total<<" --> "<<instructions[pc]<<endl;
             int offset = stoi(params[pc][2]);
             if((offset+reg[params[pc][3]])%4 != 0 || (offset+reg[params[pc][3]])<0 ||(offset+reg[params[pc][3]])>DATA_MEMORY*4){
                 cout<<"Program tried to access invalid memory location. "<<endl;
                 exit(-1);
             }
-
             out<<"DRAM request issued : READ"<<endl<<endl;
-            int start = n_total;
-
+            start = n_total;
+            
             int row = (offset+reg[params[pc][3]])/1024;
             if(curr==-1){
-                n_total += ROW_ACCESS_DELAY + COL_ACCESS_DELAY;
+                finish =start + ROW_ACCESS_DELAY + COL_ACCESS_DELAY;
                 curr = row;
+                row_buffer=DRAM[row];
+                num_rbf++;
+                msg1 = "ROW "+to_string(row)+" activated";
+                msg2 = "Data at the column offset from the row buffer loaded to Register "+params[pc][1];
             } else if (curr == row){
-                n_total += COL_ACCESS_DELAY;
+                finish =start + COL_ACCESS_DELAY;
+                msg1 = "ROW "+to_string(row)+" already present in ROW BUFFER";
+                msg2 = "Data at the column offset from the row buffer loaded to Register "+params[pc][1];
             } else {
-                n_total += ROW_ACCESS_DELAY*2 + COL_ACCESS_DELAY;
-                curr = row;                
+                msg1 = "ROW "+to_string(curr)+" copied back to DRAM and ROW "+to_string(row)+" activated";
+                msg2 = "Data at the column offset from the row buffer loaded to Register "+params[pc][1];
+                finish =start + ROW_ACCESS_DELAY*2 + COL_ACCESS_DELAY;
+                DRAM[curr] = row_buffer;
+                row_buffer = DRAM[row];
+                curr = row; 
+                num_rbf++;   
+                
             }
+            int pc_temp = pc;
 
-            out<<"Cycle "<<start+1<<"-"<<n_total<<" --> "<<instructions[pc]<<endl;
-            reg[params[pc][1]] = data_memory[(offset+reg[params[pc][3]])];
             pc++;
+
+            n_total=finish;
+
+            out<<"Cycle "<<start+1<<"-"<<finish<<" --> "<<instructions[pc_temp]<<endl;
+            out<<msg1<<endl;
+            out<<msg2<<endl;
+            reg[params[pc_temp][1]] = data_memory[(offset+reg[params[pc_temp][3]])];
+            
             print();  
 
-        } else if (Instruction=="sw"){
+        } else if (Instruction=="sw"){       // WRITE
+
             out<<"Cycle "<<n_total<<" --> "<<instructions[pc]<<endl;
             int offset = stoi(params[pc][2]);
             if((offset+reg[params[pc][3]])%4 != 0 || (offset+reg[params[pc][3]])<0  || (offset+reg[params[pc][3]])>DATA_MEMORY*4){
                 cout<<"Program tried to access invalid memory location."<<endl;
                 exit(-1);
             }
-
             out<<"DRAM request issued : WRITE"<<endl<<endl;
-            int start = n_total;
-
+            
+            start = n_total;
+            
             int row = (offset+reg[params[pc][3]])/1024;
+            
             if(curr==-1){
-                n_total += ROW_ACCESS_DELAY + COL_ACCESS_DELAY;
+                finish =start + ROW_ACCESS_DELAY + COL_ACCESS_DELAY;
                 curr = row;
+                row_buffer=DRAM[row];
+                num_rbf+=2;
+                msg1 = "ROW "+to_string(row)+" activated";
+                msg2 = "Data from Register "+params[pc][1]+" stored at the column offset in row buffer";
             } else if (curr == row){
-                n_total += COL_ACCESS_DELAY;
+                finish =start + COL_ACCESS_DELAY;
+                num_rbf++;
+                msg1 = "ROW "+to_string(row)+" already present in ROW BUFFER";
+                msg2 = "Data from Register "+params[pc][1]+" stored at the column offset in row buffer";
             } else {
-                n_total += ROW_ACCESS_DELAY*2 + COL_ACCESS_DELAY;
-                curr = row;                
+                msg1 = "ROW "+to_string(curr)+" copied back to DRAM and ROW "+to_string(row)+" activated";
+                msg2 = "Data from Register "+params[pc][1]+" stored at the column offset in row buffer";
+                finish =start + ROW_ACCESS_DELAY*2 + COL_ACCESS_DELAY;
+                DRAM[curr] = row_buffer;
+                row_buffer = DRAM[row];
+                curr = row;
+                num_rbf+=2;              
             }
-
-            out<<"Cycle "<<start+1<<"-"<<n_total<<" --> "<<instructions[pc]<<endl;
-            data_memory[(offset+reg[params[pc][3]])] = reg[params[pc][1]];
-            DRAM[(offset+reg[params[pc][3]])/1024][((offset+reg[params[pc][3]])%1024)/4] = reg[params[pc][1]];
+            int pc_temp = pc;
+            
             pc++;
+
+            n_total=finish;
+
+            out<<"Cycle "<<start+1<<"-"<<n_total<<" --> "<<instructions[pc_temp]<<endl;
+            out<<msg1<<endl;
+            out<<msg2<<endl;
+            data_memory[(offset+reg[params[pc_temp][3]])] = reg[params[pc_temp][1]];
+            row_buffer[((offset+reg[params[pc_temp][3]])%1024)/4] = reg[params[pc_temp][1]];
             print();
 
         } else if (Instruction=="addi"){
-            out<<"Cycle "<<n_total<<" --> "<<instructions[pc]<<endl;
-            reg[params[pc][1]]=reg[params[pc][2]]+stoi(params[pc][3]);
-            pc++; 
-            print();  
+            addi();  
 
         } else if( label.find(params[pc][0]) != label.end() ){
              pc ++;
@@ -497,15 +577,23 @@ int main(int argc, char *argv[]) {
         }
         
     }
+    if(curr!=-1) DRAM[curr] = row_buffer; 
     // Prints the relevant statistics of the MIPS code. 
     cout<<"Total Number of clock cycles: "<<n_total<<endl;
-    out<<"Number of clock cycles: "<<n_total<<endl;
+    out<<"Total Number of clock cycles: "<<n_total<<endl;
+
+    cout<<"Total Number of Row-buffer Updates: "<<num_rbf<<endl;
+    out<<"Total Number of Row-buffer Updates: "<<num_rbf<<endl;
+
     cout<<"Instruction Memory Used: "<<num*4 <<" Bytes"<<endl;
     out<<"Instruction Memory Used: "<<num*4 <<" Bytes"<<endl;
+
     cout<<"Data Memory Used: "<<data_memory.size()*4 <<" Bytes"<<endl;
     out<<"Data Memory Used: "<<data_memory.size()*4 <<" Bytes"<<endl;
+
     cout<<"Number of times each instruction was executed :"<<endl;
-    out<<"Number of times each instruction was executed :"<<endl;      
+    out<<"Number of times each instruction was executed :"<<endl; 
+
     for (auto j: operations){
         cout<< j<< " ->"<<statistics[j]<<endl;
         out<< j << " ->"<<statistics[j]<<endl;
@@ -524,7 +612,6 @@ int main(int argc, char *argv[]) {
         cout<<v.first<<"-"<<v.first+3<<": "<<v.second<<endl;
         out<<v.first<<"-"<<v.first+3<<": "<<v.second<<endl;
     }
-
 
     out.close();
 	return 0;

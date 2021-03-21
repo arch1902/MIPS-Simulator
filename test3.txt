@@ -8,6 +8,15 @@ main:
 	
 	lw $t2, 0($s0)
 	lw $t3, 0($s1)
+
+    addi $t4, $t2, 1
+    addi $t4, $t2, 2
+    addi $t4, $t2, 3
+    addi $t4, $t2, 4
+    addi $t4, $t2, 5
+    addi $t4, $t2, 6
+    addi $t4, $t2, 7
+    addi $t4, $t2, 8
 	
 	add $t3, $t3, $t2
 	addi $s2, $zero, 1028
